@@ -1,5 +1,6 @@
-from flask import Flask, request, jsonify
-import requests
+from flask import Flask, request, jsonify, send_from_directory
+from api import api_bp
+from models import init_db, save_trade
 import os
 
 app = Flask(__name__)
@@ -84,3 +85,47 @@ def webhook():
 
 # === Run App ===
 app.run(host='0.0.0.0', port=8080)
+
+# === main.py ===
+from flask import Flask, request, jsonify, send_from_directory
+from api import api_bp
+from models import init_db, save_trade
+import os
+
+
+app = Flask(__name__)
+app.register_blueprint(api_bp, url_prefix="/api")
+
+
+init_db()
+
+
+@app.route("/webhook", methods=["POST"])
+def webhook():
+data = request.json
+action = data.get("action")
+symbol = data.get("symbol")
+price = data.get("price")
+quantity = data.get("quantity")
+
+
+if not all([action, symbol, price, quantity]):
+return {"error": "Missing data"}, 400
+
+
+save_trade(action, symbol, float(price), int(quantity))
+return {"status": "trade saved"}
+
+
+@app.route("/")
+def index():
+return send_from_directory("frontend", "index.html")
+
+
+@app.route("/<path:path>")
+def static_files(path):
+return send_from_directory("frontend", path)
+
+
+if __name__ == "__main__":
+app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
