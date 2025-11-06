@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Trade Dashboard</title>
+<style>
+body { font-family: Arial; padding: 20px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 8px 12px; border: 1px solid #ccc; }
+</style>
+</head>
+<body>
+<h2>Executed Trades</h2>
+<table>
+<thead>
+<tr><th>Time</th><th>Action</th><th>Symbol</th><th>Price</th><th>Qty</th></tr>
+</thead>
+<tbody id="tradeTable"></tbody>
+</table>
+
+
+<script>
+fetch('/api/trades')
+.then(res => res.json())
+.then(data => {
+const table = document.getElementById('tradeTable');
+data.forEach(trade => {
+const row = `<tr>
+<td>${new Date(trade.timestamp).toLocaleString()}</td>
+<td>${trade.action}</td>
+<td>${trade.symbol}</td>
+<td>${trade.price}</td>
+<td>${trade.quantity}</td>
+</tr>`;
+table.innerHTML += row;
+});
+});
+</script>
+</body>
+</html>
