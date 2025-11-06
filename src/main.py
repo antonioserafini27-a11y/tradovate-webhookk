@@ -1,6 +1,5 @@
-from flask import Flask, request, jsonify, send_from_directory
-from api import api_bp
-from models import init_db, save_trade
+from flask import Flask, request, jsonify
+import requests
 import os
 
 app = Flask(__name__)
